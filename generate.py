@@ -1,7 +1,7 @@
 """TikTok video factory: makes ready-to-upload vertical videos for several channels.
 
 Pipeline per video: Gemini (topic + script) -> edge-tts (voice + word timings)
--> Pexels (stock clips) -> ffmpeg (1080x1920 video with burned-in subtitles).
+-> Pixabay/Pexels (stock clips) -> ffmpeg (1080x1920 video with burned-in subtitles).
 Usage: python generate.py            # all channels
        python generate.py <name>     # one channel (for testing)
 """
@@ -24,7 +24,8 @@ ROOT = Path(__file__).parent
 OUT = ROOT / "output"
 HISTORY = ROOT / "history.json"
 GEMINI_KEY = os.environ["GEMINI_API_KEY"]
-PEXELS_KEY = os.environ["PEXELS_API_KEY"]
+PEXELS_KEY = os.environ.get("PEXELS_API_KEY", "")
+PIXABAY_KEY = os.environ.get("PIXABAY_API_KEY", "")
 MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
 
 SUB_STYLE = (
@@ -102,7 +103,15 @@ def duration(path):
     return float(out.strip())
 
 
-def fetch_clip(query, dest, used):
+def download(link, dest):
+    with requests.get(link, stream=True, timeout=90) as resp:
+        resp.raise_for_status()
+        with open(dest, "wb") as fh:
+            for part in resp.iter_content(1 << 20):
+                fh.write(part)
+
+
+def fetch_pexels(query, dest, used):
     r = requests.get(
         "https://api.pexels.com/videos/search",
         headers={"Authorization": PEXELS_KEY},
@@ -110,20 +119,53 @@ def fetch_clip(query, dest, used):
         timeout=30,
     )
     r.raise_for_status()
-    vids = [v for v in r.json().get("videos", []) if v["id"] not in used]
+    vids = [v for v in r.json().get("videos", []) if ("px", v["id"]) not in used]
     if not vids:
         return None
     v = random.choice(vids[:5])
     files = [f for f in v["video_files"] if f.get("width") and f.get("height")]
     hd = [f for f in files if f["width"] >= 1080 and f["height"] > f["width"]]
     f = min(hd, key=lambda x: x["width"]) if hd else max(files, key=lambda x: x["width"])
-    used.add(v["id"])
-    with requests.get(f["link"], stream=True, timeout=90) as resp:
-        resp.raise_for_status()
-        with open(dest, "wb") as fh:
-            for part in resp.iter_content(1 << 20):
-                fh.write(part)
+    used.add(("px", v["id"]))
+    download(f["link"], dest)
     return dest
+
+
+def fetch_pixabay(query, dest, used):
+    r = requests.get(
+        "https://pixabay.com/api/videos/",
+        params={"key": PIXABAY_KEY, "q": query, "per_page": 10, "safesearch": "true"},
+        timeout=30,
+    )
+    r.raise_for_status()
+    hits = [h for h in r.json().get("hits", []) if ("pb", h["id"]) not in used]
+    if not hits:
+        return None
+    h = random.choice(hits[:5])
+    for size in ("large", "medium", "small"):
+        link = h["videos"].get(size, {}).get("url")
+        if link:
+            used.add(("pb", h["id"]))
+            download(link, dest)
+            return dest
+    return None
+
+
+def fetch_clip(query, dest, used):
+    providers = []
+    if PEXELS_KEY:
+        providers.append(fetch_pexels)
+    if PIXABAY_KEY:
+        providers.append(fetch_pixabay)
+    for fn in providers:
+        try:
+            got = fn(query, dest, used)
+        except Exception as e:
+            print(f"  {fn.__name__} '{query}' failed: {e}")
+            got = None
+        if got:
+            return got
+    return None
 
 
 def build_video(work, keywords, out_path):
@@ -157,6 +199,8 @@ def build_video(work, keywords, out_path):
 
 
 def main():
+    if not (PEXELS_KEY or PIXABAY_KEY):
+        sys.exit("Set PIXABAY_API_KEY (or PEXELS_API_KEY)")
     cfg = yaml.safe_load((ROOT / "channels.yaml").read_text(encoding="utf-8"))
     history = json.loads(HISTORY.read_text()) if HISTORY.exists() else {}
     today = datetime.date.today().isoformat()
