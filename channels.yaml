@@ -1,0 +1,54 @@
+# 10 channels, 5 niches x 2 different angles. Edit freely.
+# voice: any edge-tts voice (run `edge-tts --list-voices`). rate: speech speed.
+videos_per_day: 1
+
+channels:
+  - name: money_basics
+    niche: personal finance for beginners (saving, budgeting, debt, credit basics)
+    style: calm, clear, practical tips with simple numbers; educational, never promises returns
+    voice: en-US-GuyNeural
+
+  - name: wealth_myths
+    niche: investing concepts and common money myths (index funds, compound interest, inflation)
+    style: myth-busting, slightly provocative hook, then a clear explanation; no financial advice
+    voice: en-GB-RyanNeural
+
+  - name: ai_tools_daily
+    niche: AI tools and prompts that save time at work and study
+    style: fast, energetic, "tool + what it does + how to use it in 3 steps"
+    voice: en-US-AriaNeural
+
+  - name: tech_facts
+    niche: surprising technology facts, gadgets and how everyday tech works
+    style: curious, storytelling, "did you know" energy
+    voice: en-US-ChristopherNeural
+
+  - name: side_hustle_lab
+    niche: realistic side hustles and online business ideas
+    style: honest and realistic, no get-rich-quick claims, concrete first steps
+    voice: en-AU-WilliamNeural
+
+  - name: biz_stories
+    niche: short stories of how famous companies and founders succeeded or failed
+    style: dramatic storytelling with a lesson at the end
+    voice: en-US-DavisNeural
+
+  - name: health_science
+    niche: science-backed health habits (sleep, nutrition, stress, energy)
+    style: evidence-based, friendly, includes a simple actionable tip; no medical claims or cures
+    voice: en-US-JennyNeural
+
+  - name: home_fit
+    niche: quick home workouts and fitness tips with no equipment
+    style: motivating, step-by-step, beginner friendly
+    voice: en-US-AndrewNeural
+
+  - name: focus_hacks
+    niche: productivity and focus techniques backed by research
+    style: concise, "one technique per video" with how to apply it today
+    voice: en-GB-SoniaNeural
+
+  - name: mind_psychology
+    niche: psychology facts about habits, motivation and human behavior
+    style: intriguing hook, simple explanation, relatable example
+    voice: en-US-EmmaNeural
