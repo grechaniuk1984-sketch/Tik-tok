@@ -34,15 +34,23 @@ SUB_STYLE = (
 )
 
 
+MODELS = [m for m in [os.environ.get("GEMINI_MODEL"), "gemini-3.1-flash-lite", "gemini-flash-latest"] if m]
+
+
 def gemini_json(prompt):
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent"
     body = {
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {"responseMimeType": "application/json", "temperature": 1.0},
     }
-    r = requests.post(url, params={"key": GEMINI_KEY}, json=body, timeout=90)
-    r.raise_for_status()
-    return json.loads(r.json()["candidates"][0]["content"]["parts"][0]["text"])
+    last = None
+    for model in MODELS:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+        r = requests.post(url, params={"key": GEMINI_KEY}, json=body, timeout=90)
+        if r.status_code == 200:
+            return json.loads(r.json()["candidates"][0]["content"]["parts"][0]["text"])
+        last = f"{model}: {r.status_code} {r.text[:300]}"
+        print("Gemini error ->", last)
+    raise RuntimeError(last)
 
 
 def write_script(ch, recent, today):
