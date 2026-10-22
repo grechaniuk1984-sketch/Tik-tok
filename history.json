@@ -1,26 +1,35 @@
 {
  "money_basics": [
-  "The 'Subscription Creep' Audit"
+  "The 'Subscription Creep' Audit",
+  "The 'Bank Account Stacking' Method"
  ],
  "wealth_myths": [
-  "The 'Cash is King' Fallacy in High Inflation"
+  "The 'Cash is King' Fallacy in High Inflation",
+  "The 'Wait for the Dip' Market Timing Myth"
  ],
  "ai_tools_daily": [
   "AI-powered automated meeting documentation with Fireflies.ai"
  ],
  "tech_facts": [
-  "The Illusion of the Haptic Trackpad"
+  "The Illusion of the Haptic Trackpad",
+  "The hidden physics of invisible wireless charging"
  ],
  "side_hustle_lab": [
-  "Selling AI-generated prompts on niche marketplaces"
+  "Selling AI-generated prompts on niche marketplaces",
+  "Micro-SaaS development for vertical niches"
  ],
  "health_science": [
-  "Post-Meal Walking for Steady Energy"
+  "Post-Meal Walking for Steady Energy",
+  "Delaying Morning Caffeine for All-Day Energy"
  ],
  "home_fit": [
-  "3-Move Mobility Routine to Reverse All-Day Sitting"
+  "3-Move Mobility Routine to Reverse All-Day Sitting",
+  "The 5-Minute 'No-Gym' Morning Metabolism Reset"
  ],
  "mind_psychology": [
   "The Zeigarnik Effect and Procrastination"
+ ],
+ "focus_hacks": [
+  "The 1-3-5 Rule for Prioritization"
  ]
 }
